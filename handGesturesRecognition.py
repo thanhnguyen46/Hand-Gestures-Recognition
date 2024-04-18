@@ -11,7 +11,8 @@ from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
 tf.random.set_seed(3)
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Flatten, Dense, LeakyReLU, Input
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, LeakyReLU, Dropout, Input
+from tensorflow.keras.callbacks import EarlyStopping
 
 # HANDLING DATASET
 
@@ -80,21 +81,51 @@ X_train = X_train / 255
 X_valid = X_valid / 255
 X_test = X_test / 255
 
+# Reshape the data to include the channel dimension
+X_train = X_train.reshape(-1, 240, 640, 1)
+X_valid = X_valid.reshape(-1, 240, 640, 1)
+X_test = X_test.reshape(-1, 240, 640, 1)
+
 # Define the model architecture
 model = Sequential([
-    Input(shape=(240, 640)),
+    Input(shape=(240, 640, 1)),
+    Conv2D(32, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
     Flatten(),
-    Dense(64),
-    LeakyReLU(negative_slope=0.1),
-    Dense(32),
-    LeakyReLU(negative_slope=0.1),
-    Dense(16),
-    LeakyReLU(negative_slope=0.1),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(64, activation='relu'),
+    Dropout(0.5),
     Dense(10, activation='softmax')
 ])
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+""" # Define early stopping callbacks
+early_stop_loss = EarlyStopping(
+    monitor='val_loss',
+    min_delta=0.001,
+    patience=5,
+    mode='min',
+    baseline=0.01,
+    restore_best_weights=True,
+    verbose=1
+)
+
+early_stop_acc = EarlyStopping(
+    monitor='val_accuracy',
+    min_delta=0.001,
+    patience=5,
+    mode='max',
+    baseline=0.995,  # Stop training if validation accuracy >= 99.5%
+    restore_best_weights=True,
+    verbose=1
+) """
 
 # Train the model
 epochs = 10
