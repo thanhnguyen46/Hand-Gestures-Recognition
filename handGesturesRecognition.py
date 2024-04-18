@@ -12,6 +12,7 @@ import seaborn as sns
 tf.random.set_seed(3)
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Flatten, Dense, LeakyReLU, Input
+import tensorflowjs as tfjs
 
 # HANDLING DATASET
 
@@ -191,10 +192,13 @@ plt.show()
 
 # Save the model architecture to JSON file
 model_json = model.to_json()
-with open('GestureRecognition_model.json', 'w') as json_file:
+with open('real-time-gesture-recognition/public/GestureRecognition_model.json', 'w') as json_file:
     json_file.write(model_json)
-print('Model saved to disk')
+print('Model architecture saved to disk')
 
 # Save the model weights
-model.save_weights('GestureRecognition.weights.h5')
+model.save_weights('real-time-gesture-recognition/public/GestureRecognition.weights.h5')
 print('Weights saved to disk')
+
+model.save('real-time-gesture-recognition/public/GestureRecognition_model.h5')
+print('Model saved in SavedModel format')
