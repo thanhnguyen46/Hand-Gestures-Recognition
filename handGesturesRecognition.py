@@ -11,8 +11,8 @@ from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
 tf.random.set_seed(3)
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, LeakyReLU, Dropout, Input
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
+#from tensorflow.keras.callbacks import EarlyStopping
 
 # HANDLING DATASET
 
@@ -163,7 +163,7 @@ plt.title('Training and Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig('training_validation_loss.png')
+plt.savefig('/figures-output/training_validation_loss.png')
 plt.show()
 
 # Plot training and validation accuracy
@@ -175,7 +175,7 @@ plt.title('Training and Validation Accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
-plt.savefig('training_validation_accuracy.png')
+plt.savefig('/figures-output/training_validation_accuracy.png')
 plt.show()
 
 # Evaluate the model
@@ -205,7 +205,7 @@ sns.heatmap(conf_mat, annot=True, fmt='d', cmap='Blues', xticklabels=range(10), 
 plt.xlabel('Predicted Labels')
 plt.ylabel('True Labels')
 plt.title('Confusion Matrix')
-plt.savefig('confusion_matrix.png')
+plt.savefig('/figures-output/confusion_matrix.png')
 plt.show()
 
 # Generate classification report
@@ -217,15 +217,15 @@ plt.figure(figsize=(10, 6))
 plt.text(0.1, 0.5, class_report, fontsize=12, ha='left', va='center')
 plt.axis('off')
 plt.tight_layout()
-plt.savefig('classification_report.png')
+plt.savefig('/figures-output/classification_report.png')
 plt.show()
 
 # Save the model architecture to JSON file
 model_json = model.to_json()
-with open('GestureRecognition_model.json', 'w') as json_file:
+with open('/backend/GestureRecognition_model.json', 'w') as json_file:
     json_file.write(model_json)
 print('Model saved to disk')
 
 # Save the model weights
-model.save_weights('GestureRecognition.weights.h5')
+model.save_weights('/backend/GestureRecognition.weights.h5')
 print('Weights saved to disk')
