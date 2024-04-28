@@ -32,24 +32,27 @@ files_names = ['01_palm', '02_l', '03_fist', '04_fist_moved', '05_thumb', '06_in
 training_data = []
 
 # Create training data with added noise
-def create_training_data():
+def create_training_data(noise_std=40):
     for folder in folders_names:
         Class_num = folder[-1]
         print('Class', Class_num)
         for file in files_names:
             path = os.path.join(folder, file)
-            print(file)
             for img in tqdm(os.listdir(path)):
-                img_array = cv2.imread(os.path.join(path, img), cv2.IMREAD_GRAYSCALE)
+                img_path = os.path.join(path, img)
+                img_array = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
                 
-                # Add random noise to the image
-                noise = np.random.normal(0, 20, img_array.shape)
-                noisy_img_array = np.clip(img_array + noise, 0, 255).astype(np.uint8)
-                
-                training_data.append([noisy_img_array, int(Class_num)])
+                if img_array is not None:
+                    # Add random noise to the image with increased standard deviation
+                    noise = np.random.normal(0, noise_std, img_array.shape)
+                    noisy_img_array = np.clip(img_array + noise, 0, 255).astype(np.uint8)
+                    
+                    training_data.append([noisy_img_array, int(Class_num)])
+                else:
+                    print(f"Failed to load image: {img_path}")
 
-# Call training data function
-create_training_data()
+# Call training data function with increased noise level
+create_training_data(noise_std=40)
 
 # Shuffle the training data
 random.shuffle(training_data)
@@ -90,16 +93,6 @@ X_test = X_test / 255
 X_train = X_train.reshape(-1, 240, 640, 1)
 X_valid = X_valid.reshape(-1, 240, 640, 1)
 X_test = X_test.reshape(-1, 240, 640, 1)
-
-# Visualize noisy images
-fig, axes = plt.subplots(2, 5, figsize=(12, 6))
-axes = axes.flatten()
-for i in range(10):
-    axes[i].imshow(X_train[i].reshape(240, 640), cmap='gray')
-    axes[i].set_title(f"Noisy Image - Class {y_train[i]}")
-    axes[i].axis('off')
-plt.tight_layout()
-plt.show()
 
 # Define the model architecture
 model = Sequential([
@@ -178,7 +171,7 @@ plt.title('Training and Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig('/figures-output/training_validation_loss.png')
+plt.savefig('figures-output/training_validation_loss_noisy40.png')
 plt.show()
 
 # Plot training and validation accuracy
@@ -190,7 +183,7 @@ plt.title('Training and Validation Accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
-plt.savefig('/figures-output/training_validation_accuracy.png')
+plt.savefig('figures-output/training_validation_accuracy_noisy40.png')
 plt.show()
 
 # Evaluate the model
@@ -220,7 +213,7 @@ sns.heatmap(conf_mat, annot=True, fmt='d', cmap='Blues', xticklabels=range(10), 
 plt.xlabel('Predicted Labels')
 plt.ylabel('True Labels')
 plt.title('Confusion Matrix')
-plt.savefig('/figures-output/confusion_matrix.png')
+plt.savefig('figures-output/confusion_matrix_noisy40.png')
 plt.show()
 
 # Generate classification report
@@ -232,10 +225,10 @@ plt.figure(figsize=(10, 6))
 plt.text(0.1, 0.5, class_report, fontsize=12, ha='left', va='center')
 plt.axis('off')
 plt.tight_layout()
-plt.savefig('/figures-output/classification_report.png')
+plt.savefig('figures-output/classification_report_noisy40.png')
 plt.show()
 
-# Save the model architecture to JSON file
+""" # Save the model architecture to JSON file
 model_json = model.to_json()
 with open('/backend/GestureRecognition_model.json', 'w') as json_file:
     json_file.write(model_json)
@@ -243,4 +236,4 @@ print('Model saved to disk')
 
 # Save the model weights
 model.save_weights('/backend/GestureRecognition.weights.h5')
-print('Weights saved to disk')
+print('Weights saved to disk') """
